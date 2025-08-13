@@ -19,6 +19,237 @@
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
+        /* --- History Timeline Enhancements --- */
+        .timeline-item {
+            position: relative;
+            padding-bottom: 4rem;
+            cursor: pointer;
+            z-index: 1;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            bottom: -0.5rem;
+            width: 3px;
+            background: linear-gradient(to bottom, #3b82f6 0%, #38bdf8 100%);
+            border-radius: 2px;
+            z-index: 0;
+            opacity: 0.7;
+        }
+        .timeline-item:last-child:before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            transform: translateX(-45%);
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, #38bdf8 60%, #3b82f6 100%);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.15), 0 2px 8px 0 rgba(59,130,246,0.10);
+            border: 2.5px solid #fff;
+            transition: background 0.3s, box-shadow 0.3s;
+            z-index: 2;
+        }
+        .timeline-item:hover .timeline-dot {
+            background: linear-gradient(135deg, #3b82f6 60%, #38bdf8 100%);
+            box-shadow: 0 0 0 8px rgba(59,130,246,0.18), 0 4px 16px 0 rgba(59,130,246,0.18);
+        }
+        .timeline-card {
+            background: linear-gradient(120deg, #23272f 60%, #1e293b 100%);
+            border: 1.5px solid #334155;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+            margin-left: 2.5rem;
+            margin-top: 0.25rem;
+            transition: box-shadow 0.3s, border-color 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        .timeline-item:hover .timeline-card {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px 0 rgba(59,130,246,0.18), 0 1.5px 6px 0 rgba(0,0,0,0.12), 0 0 16px 2px #3b82f633;
+        }
+        @media (max-width: 640px) {
+            .timeline-card {
+                margin-left: 1.5rem;
+                padding: 1rem;
+            }
+            .timeline-dot {
+                width: 1rem;
+                height: 1rem;
+            }
+        }
+        /* --- Global Sitewide Enhancements --- */
+        main h2, main h3, main h4 {
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.01em;
+        }
+        main h2 {
+            font-size: 2.2rem;
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+        }
+        main h3 {
+            font-size: 1.35rem;
+            color: #38bdf8;
+        }
+        main h4 {
+            font-size: 1.1rem;
+            color: #a5b4fc;
+        }
+        .section-card, #learning-list .section-card {
+            border: 1.5px solid #2d3748;
+            background: linear-gradient(120deg, #23272f 60%, #1e293b 100%);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 12px 0 rgba(59,130,246,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.10);
+            transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, transform 0.3s;
+        }
+        .section-card:hover, #learning-list .section-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px 0 rgba(59,130,246,0.15), 0 1.5px 6px 0 rgba(0,0,0,0.12);
+            background: linear-gradient(120deg, #1e293b 60%, #23272f 100%);
+            transform: translateY(-4px) scale(1.012);
+        }
+        .section-card h3, #learning-list .section-card h3 {
+            font-size: 1.1rem;
+            letter-spacing: 0.01em;
+        }
+        .section-card p, #learning-list .section-card p {
+            color: #a0aec0;
+        }
+        /* Buttons */
+        button, .btn {
+            font-size: 1.08rem;
+            letter-spacing: 0.01em;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+            background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+            color: #fff;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+        }
+        button:hover, .btn:hover {
+            background: linear-gradient(90deg, #1e40af 60%, #2563eb 100%);
+            border-color: #2563eb;
+            box-shadow: 0 4px 16px 0 rgba(59,130,246,0.18);
+            color: #e0e7ef;
+        }
+        /* Grid layouts for cards */
+        .grid, #learning-list.grid {
+            gap: 1.5rem;
+        }
+        /* Timeline and tab enhancements */
+        .timeline-card {
+            border: 1.5px solid #334155;
+            background: linear-gradient(120deg, #23272f 60%, #1e293b 100%);
+            box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+        }
+        .timeline-item:hover .timeline-card {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px 0 rgba(59,130,246,0.15), 0 1.5px 6px 0 rgba(0,0,0,0.12);
+        }
+        .tab, .tab.active {
+            border-radius: 0.5rem 0.5rem 0 0;
+            border: 1.5px solid #334155;
+            margin-right: 0.25rem;
+            background: #23272f;
+            color: #a5b4fc;
+        }
+        .tab.active {
+            background: #3b82f6;
+            color: #fff;
+            border-bottom: 2.5px solid #3b82f6;
+        }
+        /* Chart container */
+        .chart-container {
+            background: linear-gradient(120deg, #23272f 60%, #1e293b 100%);
+            border-radius: 0.75rem;
+            border: 1.5px solid #334155;
+            box-shadow: 0 2px 8px 0 rgba(59,130,246,0.08);
+        }
+        /* Learning Hub custom styles */
+        #learning-list {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        #learning-list .section-card {
+            border: 1.5px solid #2d3748;
+            background: linear-gradient(120deg, #23272f 60%, #1e293b 100%);
+            transition: box-shadow 0.3s, border-color 0.3s, background 0.3s;
+        }
+        #learning-list .section-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px 0 rgba(59,130,246,0.15), 0 1.5px 6px 0 rgba(0,0,0,0.12);
+            background: linear-gradient(120deg, #1e293b 60%, #23272f 100%);
+        }
+        #learning-list .section-card h3 {
+            font-size: 1.1rem;
+            letter-spacing: 0.01em;
+        }
+        #learning-list .section-card p {
+            color: #a0aec0;
+        }
+        #toggle-resources {
+            margin-top: 1.5rem;
+            font-size: 1.08rem;
+            letter-spacing: 0.01em;
+            border: 2.5px solid #3b82f6;
+            box-shadow: 0 2px 12px 0 rgba(59,130,246,0.13);
+            background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+            color: #fff;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5em;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.2s, border-color 0.2s, box-shadow 0.2s, color 0.2s;
+        }
+        #toggle-resources .chevron {
+            display: inline-block;
+            width: 1.2em;
+            height: 1.2em;
+            margin-left: 0.2em;
+            transition: transform 0.3s cubic-bezier(.4,2,.6,1), color 0.2s;
+            color: #a5b4fc;
+        }
+        #toggle-resources.expanded .chevron {
+            transform: rotate(180deg);
+            color: #38bdf8;
+        }
+        #toggle-resources:focus {
+            outline: 2.5px solid #38bdf8;
+            outline-offset: 2px;
+        }
+        #toggle-resources:hover {
+            background: linear-gradient(90deg, #1e40af 60%, #2563eb 100%);
+            border-color: #2563eb;
+            box-shadow: 0 4px 16px 0 rgba(59,130,246,0.18);
+            color: #e0e7ef;
+        }
+        #learning-list .section-card {
+            transition: box-shadow 0.3s, border-color 0.3s, background 0.3s, opacity 0.3s, transform 0.3s;
+            opacity: 1;
+        }
+        #learning-list .section-card.hide-anim {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+            pointer-events: none;
+        }
+        
+        #toggle-resources:hover {
+            background: linear-gradient(90deg, #1e40af 60%, #2563eb 100%);
+            border-color: #2563eb;
+            box-shadow: 0 4px 16px 0 rgba(59,130,246,0.18);
+        }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #121212;
@@ -96,15 +327,10 @@
             background-color: #3b82f6;
         }
         .timeline-card {
-            background-color: #2d2d2d;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            transition: box-shadow 0.3s ease;
+            /* removed duplicate/old timeline-card styles */
         }
         .timeline-item:hover .timeline-card {
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3), 0 0 0 4px rgb(59 130 246 / 0.5);
-            transform: none;
+            /* removed duplicate/old timeline-card styles */
         }
     </style>
 </head>
@@ -287,89 +513,13 @@
             <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">Learning Hub</h2>
             <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">Ready to start or continue your JavaScript journey? These community-trusted resources offer comprehensive guides, hands-on projects, and structured learning paths for all skill levels.</p>
             <div id="learning-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide" target="_blank" class="section-card block p-6">
-                    <h3 class="font-semibold text-blue-400">MDN Web Docs</h3>
-                    <p class="text-sm text-gray-400 mt-2">The definitive and exhaustive guide to JavaScript. An essential reference for beginners and experts alike.</p>
-                </a>
-                <a href="https://www.theodinproject.com/" target="_blank" class="section-card block p-6">
-                    <h3 class="font-semibold text-blue-400">The Odin Project</h3>
-                    <p class="text-sm text-gray-400 mt-2">Offers a full-stack curriculum with a strong focus on project-based learning with JavaScript, covering the DOM, APIs, and fundamental concepts.</p>
-                </a>
-                <a href="https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/" target="_blank" class="section-card block p-6">
-                    <h3 class="font-semibold text-blue-400">freeCodeCamp</h3>
-                    <p class="text-sm text-gray-400 mt-2">A certification path covering JavaScript fundamentals, algorithms, data structures, and ES6+ features with five required projects.</p>
-                </a>
-                <a href="https://www.codecombat.com/" target="_blank" class="section-card block p-6">
-                    <h3 class="font-semibold text-blue-400">CodeCombat</h3>
-                    <p class="text-sm text-gray-400 mt-2">A game-based learning experience where you write real JavaScript code to control characters and solve puzzles in a fun, engaging way.</p>
-                </a>
-                <a href="https://javascript.info/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">The Modern JavaScript Tutorial</h3>
-                    <p class="text-sm text-gray-400 mt-2">A detailed, step-by-step guide to modern JavaScript, from the basics to advanced topics like OOP and async programming.</p>
-                </a>
-                <a href="https://www.coursera.org/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Coursera</h3>
-                    <p class="text-sm text-gray-400 mt-2">Offers university-level courses on JavaScript and related technologies, often with a professional certificate.</p>
-                </a>
-                <a href="https://www.udemy.com/topic/javascript/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Udemy</h3>
-                    <p class="text-sm text-gray-400 mt-2">A massive library of video-based courses, with many highly-rated JavaScript bootcamps and deep dives into frameworks.</p>
-                </a>
-                <a href="https://frontendmasters.com/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Frontend Masters</h3>
-                    <p class="text-sm text-gray-400 mt-2">In-depth, expert-led courses on JavaScript, frameworks, and modern frontend technologies.</p>
-                </a>
-                <a href="https://www.w3schools.com/js/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">W3Schools JavaScript Tutorial</h3>
-                    <p class="text-sm text-gray-400 mt-2">A classic reference with simple explanations and in-browser code editors for quick practice.</p>
-                </a>
-                <a href="https://www.youtube.com/c/TraversyMedia" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Traversy Media (YouTube)</h3>
-                    <p class="text-sm text-gray-400 mt-2">A popular YouTube channel with crash courses, tutorials, and project-based learning videos on JavaScript and web dev.</p>
-                </a>
-                <a href="https://www.youtube.com/c/KevinPowell" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Kevin Powell (YouTube)</h3>
-                    <p class="text-sm text-gray-400 mt-2">Focuses on CSS and responsive design, but often features JavaScript to add interactivity to layouts.</p>
-                </a>
-                <a href="https://egghead.io/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Egghead.io</h3>
-                    <p class="text-sm text-gray-400 mt-2">Offers bite-sized video lessons for busy developers on a wide range of JavaScript topics.</p>
-                </a>
-                <a href="https://pluralsight.com/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Pluralsight</h3>
-                    <p class="text-sm text-gray-400 mt-2">Provides skill assessments and a large library of courses to help you measure and grow your JavaScript knowledge.</p>
-                </a>
-                <a href="https://www.javascripttutor.com/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">JavaScript Tutor</h3>
-                    <p class="text-sm text-gray-400 mt-2">A simple, visual tool that helps you understand how JavaScript code executes step-by-step.</p>
-                </a>
-                <a href="https://www.codecademy.com/learn/introduction-to-javascript" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Codecademy</h3>
-                    <p class="text-sm text-gray-400 mt-2">An interactive learning platform with a guided curriculum and in-browser exercises to build foundational skills.</p>
-                </a>
-                <a href="https://eloquentjavascript.net/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Eloquent JavaScript (Book)</h3>
-                    <p class="text-sm text-gray-400 mt-2">A comprehensive online book that provides a deep dive into the language, its features, and the wider web browser environment.</p>
-                </a>
-                <a href="https://www.youtube.com/c/TheNetNinja" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">The Net Ninja (YouTube)</h3>
-                    <p class="text-sm text-gray-400 mt-2">Offers clear, concise video tutorials on JavaScript, Node.js, and popular frameworks like Vue and React.</p>
-                </a>
-                <a href="https://www.youtube.com/c/Fireship" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Fireship (YouTube)</h3>
-                    <p class="text-sm text-gray-400 mt-2">Features fast-paced, high-quality videos that provide a high-level overview of complex topics and technologies.</p>
-                </a>
-                <a href="https://www.freecodecamp.org/news/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">freeCodeCamp News</h3>
-                    <p class="text-sm text-gray-400 mt-2">A great resource for staying up-to-date with new JavaScript features, tutorials, and general web development news.</p>
-                </a>
-                <a href="https://www.smashingmagazine.com/category/javascript/" target="_blank" class="section-card block p-6 hidden more-resource-item">
-                    <h3 class="font-semibold text-blue-400">Smashing Magazine</h3>
-                    <p class="text-sm text-gray-400 mt-2">A long-standing publication with high-quality articles and tutorials on advanced JavaScript techniques and best practices.</p>
-                </a>
+                <!-- Resource cards will be rendered dynamically by JavaScript -->
             </div>
             <div class="text-center mt-8">
-                <button id="toggle-resources" class="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-colors">Show more resources</button>
+                <button id="toggle-resources" class="px-6 py-3 font-medium rounded-lg shadow-md transition-colors">
+                    <span class="toggle-label">Show more resources</span>
+                    <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.085l3.71-3.855a.75.75 0 111.08 1.04l-4.24 4.4a.75.75 0 01-1.08 0l-4.24-4.4a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+                </button>
             </div>
         </section>
     </main>
@@ -381,7 +531,78 @@
     </footer>
 
     <script>
+        // Learning Hub dynamic resource rendering
+        const learningResources = [
+            { title: 'MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide', desc: 'The definitive and exhaustive guide to JavaScript. An essential reference for beginners and experts alike.' },
+            { title: 'The Odin Project', url: 'https://www.theodinproject.com/', desc: 'Offers a full-stack curriculum with a strong focus on project-based learning with JavaScript, covering the DOM, APIs, and fundamental concepts.' },
+            { title: 'freeCodeCamp', url: 'https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/', desc: 'A certification path covering JavaScript fundamentals, algorithms, data structures, and ES6+ features with five required projects.' },
+            { title: 'CodeCombat', url: 'https://www.codecombat.com/', desc: 'A game-based learning experience where you write real JavaScript code to control characters and solve puzzles in a fun, engaging way.' },
+            { title: 'The Modern JavaScript Tutorial', url: 'https://javascript.info/', desc: 'A detailed, step-by-step guide to modern JavaScript, from the basics to advanced topics like OOP and async programming.' },
+            { title: 'Coursera', url: 'https://www.coursera.org/', desc: 'Offers university-level courses on JavaScript and related technologies, often with a professional certificate.' },
+            { title: 'Udemy', url: 'https://www.udemy.com/topic/javascript/', desc: 'A massive library of video-based courses, with many highly-rated JavaScript bootcamps and deep dives into frameworks.' },
+            { title: 'Frontend Masters', url: 'https://frontendmasters.com/', desc: 'In-depth, expert-led courses on JavaScript, frameworks, and modern frontend technologies.' },
+            { title: 'W3Schools JavaScript Tutorial', url: 'https://www.w3schools.com/js/', desc: 'A classic reference with simple explanations and in-browser code editors for quick practice.' },
+            { title: 'Traversy Media (YouTube)', url: 'https://www.youtube.com/c/TraversyMedia', desc: 'A popular YouTube channel with crash courses, tutorials, and project-based learning videos on JavaScript and web dev.' },
+            { title: 'Kevin Powell (YouTube)', url: 'https://www.youtube.com/c/KevinPowell', desc: 'Focuses on CSS and responsive design, but often features JavaScript to add interactivity to layouts.' },
+            { title: 'Egghead.io', url: 'https://egghead.io/', desc: 'Offers bite-sized video lessons for busy developers on a wide range of JavaScript topics.' },
+            { title: 'Pluralsight', url: 'https://pluralsight.com/', desc: 'Provides skill assessments and a large library of courses to help you measure and grow your JavaScript knowledge.' },
+            { title: 'JavaScript Tutor', url: 'https://www.javascripttutor.com/', desc: 'A simple, visual tool that helps you understand how JavaScript code executes step-by-step.' },
+            { title: 'Codecademy', url: 'https://www.codecademy.com/learn/introduction-to-javascript', desc: 'An interactive learning platform with a guided curriculum and in-browser exercises to build foundational skills.' },
+            { title: 'Eloquent JavaScript (Book)', url: 'https://eloquentjavascript.net/', desc: 'A comprehensive online book that provides a deep dive into the language, its features, and the wider web browser environment.' },
+            { title: 'The Net Ninja (YouTube)', url: 'https://www.youtube.com/c/TheNetNinja', desc: 'Offers clear, concise video tutorials on JavaScript, Node.js, and popular frameworks like Vue and React.' },
+            { title: 'Fireship (YouTube)', url: 'https://www.youtube.com/c/Fireship', desc: 'Features fast-paced, high-quality videos that provide a high-level overview of complex topics and technologies.' },
+            { title: 'freeCodeCamp News', url: 'https://www.freecodecamp.org/news/', desc: 'A great resource for staying up-to-date with new JavaScript features, tutorials, and general web development news.' },
+            { title: 'Smashing Magazine', url: 'https://www.smashingmagazine.com/category/javascript/', desc: 'A long-standing publication with high-quality articles and tutorials on advanced JavaScript techniques and best practices.' },
+        ];
+
+        function getDefaultResourceCount() {
+            if (window.innerWidth >= 1280) return 6;
+            if (window.innerWidth >= 1024) return 4;
+            if (window.innerWidth >= 640) return 3;
+            return 2;
+        }
+
+        function renderLearningResources(showAll = false) {
+            const list = document.getElementById('learning-list');
+            list.innerHTML = '';
+            const defaultCount = getDefaultResourceCount();
+            learningResources.forEach((resource, i) => {
+                const card = document.createElement('a');
+                card.href = resource.url;
+                card.target = '_blank';
+                card.className = 'section-card block p-6';
+                card.innerHTML = `<h3 class=\"font-semibold text-blue-400\">${resource.title}</h3><p class=\"text-sm text-gray-400 mt-2\">${resource.desc}</p>`;
+                if (!showAll && i >= defaultCount) {
+                    card.classList.add('hidden', 'more-resource-item');
+                } else if (showAll && i >= defaultCount) {
+                    card.classList.add('more-resource-item');
+                }
+                list.appendChild(card);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Learning Hub dynamic rendering
+            let expanded = false;
+            renderLearningResources();
+            const toggleButton = document.getElementById('toggle-resources');
+            const toggleLabel = toggleButton.querySelector('.toggle-label');
+            const chevron = toggleButton.querySelector('.chevron');
+            function updateToggleButton() {
+                toggleButton.classList.toggle('expanded', expanded);
+                toggleLabel.textContent = expanded ? 'Show less resources' : 'Show more resources';
+            }
+            toggleButton.addEventListener('click', () => {
+                expanded = !expanded;
+                renderLearningResources(expanded);
+                updateToggleButton();
+            });
+            window.addEventListener('resize', () => {
+                if (!expanded) renderLearningResources(false);
+            });
+            updateToggleButton();
+
+            // ...existing code for frameworks, tabs, nav, etc...
             const frameworkData = {
                 react: {
                     title: 'React',
@@ -558,22 +779,7 @@
                 });
             });
 
-            const toggleButton = document.getElementById('toggle-resources');
-            const moreResources = document.querySelectorAll('.more-resource-item');
-
-            toggleButton.addEventListener('click', () => {
-                const isShowingMore = moreResources[0].classList.contains('hidden');
-                
-                moreResources.forEach(resource => {
-                    resource.classList.toggle('hidden');
-                });
-
-                if (isShowingMore) {
-                    toggleButton.textContent = 'Show less resources';
-                } else {
-                    toggleButton.textContent = 'Show more resources';
-                }
-            });
+            // (Removed duplicate toggleButton/moreResources logic)
         });
     </script>
 </body>
