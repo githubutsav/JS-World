@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Interactive World of JavaScript</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Dark Calm Harmony -->
+    <!-- Application Structure Plan: The application is structured as a thematic, single-page journey rather than a linear document. It starts with a broad introduction (Hero), moves to historical context (Timeline), dives into technical details (Core Concepts), explores the practical applications and comparisons (JS Universe & Toolkit), provides learning resources (Learning Hub), and ends with a conclusion. This non-linear, thematic approach allows users to explore topics based on interest, enhancing engagement and comprehension. Key interactions include a "show more" toggle for the Learning Hub, tabbed interfaces for dense info, button-driven chart updates for direct comparison, and an enhanced interactive timeline with visual feedback on hover, making discovery intuitive and reducing cognitive load. -->
+    <!-- Visualization & Content Choices: 
+        - History: Report Info -> JS creation/standardization dates. Goal -> Show change over time. Viz -> Interactive vertical timeline with visual hover effects. Interaction -> Hover over items to highlight and lift the card. Justification -> More engaging than a static list and provides clear visual feedback. Library -> None (custom JS/CSS).
+        - Frontend Frameworks: Report Info -> React, Angular, Vue, and Next.js stats (popularity, bundle size). Goal -> Compare key frameworks. Viz -> Bar Chart (Chart.js). Interaction -> Buttons to filter data and update chart/text. Justification -> Direct visual comparison of quantitative data is highly effective. Library -> Chart.js.
+        - Package Managers: Report Info -> npm, Yarn, pnpm features. Goal -> Compare tools. Viz -> Tabbed content cards. Interaction -> Click tabs to switch content. Justification -> Organizes distinct feature sets cleanly. Library -> None (custom JS).
+        - All other sections use structured text with clear typography and layout to present qualitative information logically and readably. The Learning Hub now features an expandable list to prevent an overly long page, allowing users to see a curated list first and then expand for a comprehensive overview.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            background-image: linear-gradient(to bottom right, #121212, #212121);
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-bottom-color 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #3b82f6;
+            border-bottom-color: #3b82f6;
+        }
+        .section-card {
+            background-color: #1e1e1e;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .tab {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2.5rem;
+            cursor: pointer;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            bottom: -0.5rem;
+            width: 2px;
+            background-color: #3d3d3d;
+        }
+        .timeline-item:last-child:before {
+            display: none;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            transform: translateX(-45%);
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: #6b7280;
+            transition: background-color 0.3s ease;
+        }
+        .timeline-item:hover .timeline-dot {
+            background-color: #3b82f6;
+        }
+        .timeline-card {
+            background-color: #2d2d2d;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .timeline-item:hover .timeline-card {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+        }
+    </style>
+</head>
+<body class="bg-slate-50">
+
+    <header class="bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 shadow-sm border-b-2 border-gray-700">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-gray-200">JS World</h1>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">Introduction</a>
+                        <a href="#history" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">History</a>
+                        <a href="#concepts" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">Core Concepts</a>
+                        <a href="#universe" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">JS Universe</a>
+                        <a href="#toolkit" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">Toolkit</a>
+                        <a href="#learning" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-gray-400">Learning Hub</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <section id="introduction" class="text-center my-16">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-100 leading-tight">A Deep Dive into JavaScript</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-lg text-gray-400">From a simple scripting language to the backbone of the modern web, explore the evolution, core principles, and vast ecosystem of JavaScript in this interactive guide.</p>
+        </section>
+
+        <section id="history" class="my-24">
+            <div class="section-card p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">The Journey of JavaScript</h2>
+                <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">This interactive timeline highlights the key milestones that transformed JavaScript from a simple scripting tool to the foundation of the modern web.</p>
+                <div class="relative w-full">
+                    <div class="border-l-2 border-gray-700 ml-4">
+                        <div class="timeline-item ml-8">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-card">
+                                <h3 class="text-lg font-semibold text-blue-400">1995: The 10-Day Prototype</h3>
+                                <p class="mt-1 text-gray-400">Brendan Eich at Netscape creates "Mocha" in just ten days. It's later renamed LiveScript, and finally JavaScript, a marketing move to align with the popular Java language.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item ml-8">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-card">
+                                <h3 class="text-lg font-semibold text-blue-400">1997: Standardization & DHTML</h3>
+                                <p class="mt-1 text-gray-400">ECMAScript 1.0 is released, standardizing the language. Dynamic HTML (DHTML) also appears, combining HTML, CSS, and JS for early dynamic web pages.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item ml-8">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-card">
+                                <h3 class="text-lg font-semibold text-blue-400">2005: The AJAX Revolution</h3>
+                                <p class="mt-1 text-gray-400">Jesse James Garrett coins the term Ajax (Asynchronous JavaScript and XML), a technique allowing web pages to update content without a full reload, revolutionizing web interactivity.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item ml-8">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-card">
+                                <h3 class="text-lg font-semibold text-blue-400">2009: Node.js & ES5</h3>
+                                <p class="mt-1 text-gray-400">Ryan Dahl creates Node.js, allowing JavaScript to run on the server. ECMAScript 5 (ES5) is also released, introducing key features like strict mode and JSON support.</p>
+                            </div>
+                        </div>
+                        <div class="timeline-item ml-8">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-card">
+                                <h3 class="text-lg font-semibold text-blue-400">2015: The Modern Era Begins</h3>
+                                <p class="mt-1 text-gray-400">ECMAScript 2015 (ES6) is a massive update, introducing `let`/`const`, arrow functions, classes, Promises, and modules, fundamentally modernizing the language.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="concepts" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">Core Concepts</h2>
+            <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">JavaScript is built on a foundation of flexible and powerful principles. This section breaks down the essential building blocks of the language, from its data types to its modern asynchronous capabilities.</p>
+            <div class="section-card p-6 md:p-8">
+                <div id="concepts-tabs" class="flex flex-wrap justify-center border-b border-gray-700 mb-6">
+                    <button data-tab="datatypes" class="tab px-4 py-2 font-medium text-gray-400 rounded-t-lg active">Data Types</button>
+                    <button data-tab="syntax" class="tab px-4 py-2 font-medium text-gray-400 rounded-t-lg">Syntax</button>
+                    <button data-tab="async" class="tab px-4 py-2 font-medium text-gray-400 rounded-t-lg">Async</button>
+                </div>
+                <div id="concepts-content">
+                    <div id="content-datatypes">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-100">Dynamic & Diverse Data</h3>
+                        <p class="text-gray-400 mb-4">As a dynamically typed language, a variable's type isn't fixed. JS features 8 data types: 7 primitives (Boolean, Number, String, BigInt, Symbol, Null, Undefined) which are immutable, and the versatile Object type for complex data structures.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>Primitives:</strong> The fundamental, unchangeable data values.</div>
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>Objects:</strong> Collections of key-value pairs, used for everything from simple data maps to complex application models.</div>
+                        </div>
+                    </div>
+                    <div id="content-syntax" class="hidden">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-100">C-Inspired Syntax</h3>
+                        <p class="text-gray-400 mb-4">JavaScript's syntax is approachable for those familiar with C-family languages. Key elements include variable declarations (`const`, `let`), functions (including concise arrow functions), operators (always use `===` for strict comparison), and control flow (`if/else`, loops).</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>`const` & `let`:</strong> Modern block-scoped variables. Prefer `const` by default.</div>
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>Arrow Functions:</strong> A shorter syntax for functions with lexical `this` binding.</div>
+                        </div>
+                    </div>
+                    <div id="content-async" class="hidden">
+                        <h3 class="text-xl font-semibold mb-2 text-gray-100">Handling Asynchronicity</h3>
+                        <p class="text-gray-400 mb-4">JavaScript handles non-blocking operations like network requests through evolving paradigms. While early code used callbacks, modern JS prefers Promises and the `async/await` syntax for cleaner, more readable asynchronous code.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>Promises:</strong> Represent the eventual result of an async operation, improving on "callback hell".</div>
+                            <div class="bg-gray-800 p-3 rounded-lg"><strong>`async/await`:</strong> Syntactic sugar over Promises, allowing async code to be written in a synchronous, more intuitive style.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="universe" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">The JavaScript Universe</h2>
+            <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">JavaScript's influence spans the entire development stack. Explore its role in crafting user interfaces on the frontend and powering servers on the backend, and compare the most popular frameworks that dominate the landscape.</p>
+            <div class="section-card p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-center mb-8 text-gray-100">Frontend Frameworks: A Comparison</h3>
+                <div class="text-center mb-6">
+                    <button id="btn-react" class="px-4 py-2 bg-blue-500 text-white rounded-md mr-2">React</button>
+                    <button id="btn-angular" class="px-4 py-2 bg-gray-600 text-gray-200 rounded-md mr-2">Angular</button>
+                    <button id="btn-vue" class="px-4 py-2 bg-gray-600 text-gray-200 rounded-md mr-2">Vue.js</button>
+                    <button id="btn-nextjs" class="px-4 py-2 bg-gray-600 text-gray-200 rounded-md">Next.js</button>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div class="chart-container">
+                            <canvas id="frameworkChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="framework-details">
+                        <h4 class="text-xl font-semibold mb-2 text-gray-100" id="fw-title">React</h4>
+                        <p class="text-gray-400" id="fw-description">A library for building UIs with a component-based architecture. Known for its flexibility, Virtual DOM for performance, and massive ecosystem. Ideal for SPAs and mobile apps via React Native.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="toolkit" class="my-24">
+             <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">The Developer's Toolkit</h2>
+            <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">A rich ecosystem of tools supports modern JavaScript development. This section introduces the essential utilities that developers use to manage project dependencies and bundle code for production.</p>
+            <div class="section-card p-6 md:p-8">
+                <h3 class="text-2xl font-bold text-center mb-8 text-gray-100">Package Managers: npm vs Yarn vs pnpm</h3>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="border p-4 rounded-lg border-gray-700">
+                        <h4 class="font-semibold text-lg text-gray-200">npm</h4>
+                        <p class="text-sm text-gray-400 mt-2">The default for Node.js. Huge registry, easy to use, with built-in security auditing.</p>
+                    </div>
+                    <div class="border p-4 rounded-lg border-blue-500 ring-2 ring-blue-800">
+                        <h4 class="font-semibold text-lg text-gray-200">pnpm</h4>
+                        <p class="text-sm text-gray-400 mt-2">Focuses on speed and disk space efficiency. Uses a global store and hard links to avoid duplicating packages.</p>
+                    </div>
+                    <div class="border p-4 rounded-lg border-gray-700">
+                        <h4 class="font-semibold text-lg text-gray-200">Yarn</h4>
+                        <p class="text-sm text-gray-400 mt-2">Known for parallel installs, offline caching, and unique features like Plug'n'Play (PnP).</p>
+                    </div>
+                </div>
+                 <h3 class="text-2xl font-bold text-center mt-16 mb-8 text-gray-100">Bundlers: Webpack vs Vite</h3>
+                <div class="grid md:grid-cols-2 gap-8 mt-6">
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="font-semibold text-lg mb-2 text-gray-200">Webpack</h4>
+                        <p class="text-sm text-gray-400">The highly configurable and powerful industry standard. Bundles the entire app before starting the dev server. Its vast plugin ecosystem can handle any asset type or transformation.</p>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h4 class="font-semibold text-lg mb-2 text-gray-200">Vite</h4>
+                        <p class="text-sm text-gray-400">The modern, fast alternative. Uses native ES modules for an instant dev server start. Prioritizes convention over configuration for a simpler developer experience, using Rollup for optimized production builds.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="learning" class="my-24">
+            <h2 class="text-3xl font-bold text-center mb-4 text-gray-100">Learning Hub</h2>
+            <p class="text-center text-gray-400 max-w-2xl mx-auto mb-12">Ready to start or continue your JavaScript journey? These community-trusted resources offer comprehensive guides, hands-on projects, and structured learning paths for all skill levels.</p>
+            <div id="learning-list" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide" target="_blank" class="section-card block p-6">
+                    <h3 class="font-semibold text-blue-400">MDN Web Docs</h3>
+                    <p class="text-sm text-gray-400 mt-2">The definitive and exhaustive guide to JavaScript. An essential reference for beginners and experts alike.</p>
+                </a>
+                <a href="https://www.theodinproject.com/" target="_blank" class="section-card block p-6">
+                    <h3 class="font-semibold text-blue-400">The Odin Project</h3>
+                    <p class="text-sm text-gray-400 mt-2">Offers a full-stack curriculum with a strong focus on project-based learning with JavaScript, covering the DOM, APIs, and fundamental concepts.</p>
+                </a>
+                <a href="https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures/" target="_blank" class="section-card block p-6">
+                    <h3 class="font-semibold text-blue-400">freeCodeCamp</h3>
+                    <p class="text-sm text-gray-400 mt-2">A certification path covering JavaScript fundamentals, algorithms, data structures, and ES6+ features with five required projects.</p>
+                </a>
+                <a href="https://www.codecombat.com/" target="_blank" class="section-card block p-6">
+                    <h3 class="font-semibold text-blue-400">CodeCombat</h3>
+                    <p class="text-sm text-gray-400 mt-2">A game-based learning experience where you write real JavaScript code to control characters and solve puzzles in a fun, engaging way.</p>
+                </a>
+                <div id="more-resources" class="hidden grid md:grid-cols-2 lg:grid-cols-3 gap-6 col-span-full">
+                    <a href="https://javascript.info/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">The Modern JavaScript Tutorial</h3>
+                        <p class="text-sm text-gray-400 mt-2">A detailed, step-by-step guide to modern JavaScript, from the basics to advanced topics like OOP and async programming.</p>
+                    </a>
+                    <a href="https://www.coursera.org/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Coursera</h3>
+                        <p class="text-sm text-gray-400 mt-2">Offers university-level courses on JavaScript and related technologies, often with a professional certificate.</p>
+                    </a>
+                    <a href="https://www.udemy.com/topic/javascript/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Udemy</h3>
+                        <p class="text-sm text-gray-400 mt-2">A massive library of video-based courses, with many highly-rated JavaScript bootcamps and deep dives into frameworks.</p>
+                    </a>
+                    <a href="https://frontendmasters.com/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Frontend Masters</h3>
+                        <p class="text-sm text-gray-400 mt-2">In-depth, expert-led courses on JavaScript, frameworks, and modern frontend technologies.</p>
+                    </a>
+                    <a href="https://www.w3schools.com/js/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">W3Schools JavaScript Tutorial</h3>
+                        <p class="text-sm text-gray-400 mt-2">A classic reference with simple explanations and in-browser code editors for quick practice.</p>
+                    </a>
+                    <a href="https://www.youtube.com/c/TraversyMedia" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Traversy Media (YouTube)</h3>
+                        <p class="text-sm text-gray-400 mt-2">A popular YouTube channel with crash courses, tutorials, and project-based learning videos on JavaScript and web dev.</p>
+                    </a>
+                    <a href="https://www.youtube.com/c/KevinPowell" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Kevin Powell (YouTube)</h3>
+                        <p class="text-sm text-gray-400 mt-2">Focuses on CSS and responsive design, but often features JavaScript to add interactivity to layouts.</p>
+                    </a>
+                    <a href="https://egghead.io/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Egghead.io</h3>
+                        <p class="text-sm text-gray-400 mt-2">Offers bite-sized video lessons for busy developers on a wide range of JavaScript topics.</p>
+                    </a>
+                    <a href="https://pluralsight.com/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Pluralsight</h3>
+                        <p class="text-sm text-gray-400 mt-2">Provides skill assessments and a large library of courses to help you measure and grow your JavaScript knowledge.</p>
+                    </a>
+                    <a href="https://www.javascripttutor.com/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">JavaScript Tutor</h3>
+                        <p class="text-sm text-gray-400 mt-2">A simple, visual tool that helps you understand how JavaScript code executes step-by-step.</p>
+                    </a>
+                    <a href="https://www.codecademy.com/learn/introduction-to-javascript" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Codecademy</h3>
+                        <p class="text-sm text-gray-400 mt-2">An interactive learning platform with a guided curriculum and in-browser exercises to build foundational skills.</p>
+                    </a>
+                    <a href="https://eloquentjavascript.net/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Eloquent JavaScript (Book)</h3>
+                        <p class="text-sm text-gray-400 mt-2">A comprehensive online book that provides a deep dive into the language, its features, and the wider web browser environment.</p>
+                    </a>
+                    <a href="https://www.youtube.com/c/TheNetNinja" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">The Net Ninja (YouTube)</h3>
+                        <p class="text-sm text-gray-400 mt-2">Offers clear, concise video tutorials on JavaScript, Node.js, and popular frameworks like Vue and React.</p>
+                    </a>
+                    <a href="https://www.youtube.com/c/Fireship" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Fireship (YouTube)</h3>
+                        <p class="text-sm text-gray-400 mt-2">Features fast-paced, high-quality videos that provide a high-level overview of complex topics and technologies.</p>
+                    </a>
+                    <a href="https://www.freecodecamp.org/news/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">freeCodeCamp News</h3>
+                        <p class="text-sm text-gray-400 mt-2">A great resource for staying up-to-date with new JavaScript features, tutorials, and general web development news.</p>
+                    </a>
+                    <a href="https://www.smashingmagazine.com/category/javascript/" target="_blank" class="section-card block p-6">
+                        <h3 class="font-semibold text-blue-400">Smashing Magazine</h3>
+                        <p class="text-sm text-gray-400 mt-2">A long-standing publication with high-quality articles and tutorials on advanced JavaScript techniques and best practices.</p>
+                    </a>
+                </div>
+            </div>
+            <div class="text-center mt-8">
+                <button id="toggle-resources" class="px-6 py-3 bg-blue-500 text-white font-medium rounded-lg shadow-md hover:bg-blue-600 transition-colors">Show more resources</button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+            <p>&copy; 2025 JS World. An interactive exploration of JavaScript.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const frameworkData = {
+                react: {
+                    title: 'React',
+                    description: 'A library for building UIs with a component-based architecture. Known for its flexibility, Virtual DOM for performance, and massive ecosystem. Ideal for SPAs and mobile apps via React Native.',
+                    chartData: {
+                        labels: ['Popularity (Usage)', 'Bundle Size (gzipped kb)'],
+                        data: [100, 2.8] 
+                    }
+                },
+                angular: {
+                    title: 'Angular',
+                    description: 'A comprehensive, opinionated framework by Google. Excellent for large-scale enterprise applications, it provides a full suite of tools for routing, state management, and more, often using TypeScript.',
+                    chartData: {
+                        labels: ['Popularity (Usage)', 'Bundle Size (gzipped kb)'],
+                        data: [25, 62.3]
+                    }
+                },
+                vue: {
+                    title: 'Vue.js',
+                    description: 'A progressive framework known for its simplicity and gentle learning curve. It scales easily from a simple library to a full-featured framework, combining the best of React and Angular.',
+                    chartData: {
+                        labels: ['Popularity (Usage)', 'Bundle Size (gzipped kb)'],
+                        data: [45, 34.7]
+                    }
+                },
+                nextjs: {
+                    title: 'Next.js',
+                    description: 'A popular React framework for building full-stack web applications. It enables features like server-side rendering (SSR), static site generation (SSG), and API routes, optimizing performance and SEO. It is a comprehensive solution built on top of React.',
+                    chartData: {
+                        labels: ['Popularity (Usage)', 'Bundle Size (gzipped kb)'],
+                        data: [80, 40]
+                    }
+                }
+            };
+
+            const fwTitle = document.getElementById('fw-title');
+            const fwDescription = document.getElementById('fw-description');
+            const btnReact = document.getElementById('btn-react');
+            const btnAngular = document.getElementById('btn-angular');
+            const btnVue = document.getElementById('btn-vue');
+            const btnNextjs = document.getElementById('btn-nextjs');
+            const allFwButtons = [btnReact, btnAngular, btnVue, btnNextjs];
+
+            const ctx = document.getElementById('frameworkChart').getContext('2d');
+            const frameworkChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: frameworkData.react.chartData.labels,
+                    datasets: [{
+                        label: 'Framework Comparison',
+                        data: frameworkData.react.chartData.data,
+                        backgroundColor: ['rgba(59, 130, 246, 0.6)', 'rgba(249, 115, 22, 0.6)'],
+                        borderColor: ['rgba(59, 130, 246, 1)', 'rgba(249, 115, 22, 1)'],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Value (Popularity is relative)',
+                                color: '#e0e0e0' 
+                            },
+                            ticks: {
+                                color: '#e0e0e0' 
+                            },
+                            grid: {
+                                color: '#3d3d3d' 
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#e0e0e0' 
+                            },
+                            grid: {
+                                color: '#3d3d3d' 
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x;
+                                        if (context.label === 'Bundle Size (gzipped kb)') {
+                                            label += ' kb';
+                                        } else {
+                                            label += ' (relative)';
+                                        }
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            function updateFrameworkView(frameworkKey) {
+                const data = frameworkData[frameworkKey];
+                fwTitle.textContent = data.title;
+                fwDescription.textContent = data.description;
+                frameworkChart.data.datasets[0].data = data.chartData.data;
+                frameworkChart.data.datasets[0].label = data.title + ' Metrics';
+                frameworkChart.update();
+
+                allFwButtons.forEach(btn => {
+                    btn.classList.remove('bg-blue-500', 'text-white');
+                    btn.classList.add('bg-gray-600', 'text-gray-200');
+                });
+                
+                const activeBtn = document.getElementById(`btn-${frameworkKey}`);
+                if (activeBtn) {
+                  activeBtn.classList.add('bg-blue-500', 'text-white');
+                  activeBtn.classList.remove('bg-gray-600', 'text-gray-200');
+                }
+            }
+
+            btnReact.addEventListener('click', () => updateFrameworkView('react'));
+            btnAngular.addEventListener('click', () => updateFrameworkView('angular'));
+            btnVue.addEventListener('click', () => updateFrameworkView('vue'));
+            btnNextjs.addEventListener('click', () => updateFrameworkView('nextjs'));
+
+            const conceptTabs = document.querySelectorAll('#concepts-tabs .tab');
+            const conceptContents = document.querySelectorAll('#concepts-content > div');
+
+            conceptTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetId = `content-${tab.dataset.tab}`;
+                    
+                    conceptTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    conceptContents.forEach(content => {
+                        if (content.id === targetId) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('nav a');
+            const sections = document.querySelectorAll('main section');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            const toggleButton = document.getElementById('toggle-resources');
+            const moreResourcesContainer = document.getElementById('more-resources');
+
+            toggleButton.addEventListener('click', () => {
+                const isHidden = moreResourcesContainer.classList.toggle('hidden');
+                if (isHidden) {
+                    toggleButton.textContent = 'Show more resources';
+                } else {
+                    toggleButton.textContent = 'Show less resources';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
