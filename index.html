@@ -66,7 +66,7 @@
         }
         .timeline-item {
             position: relative;
-            padding-bottom: 2.5rem;
+            padding-bottom: 4rem;
             cursor: pointer;
         }
         .timeline-item:before {
@@ -100,11 +100,11 @@
             border-radius: 0.75rem;
             padding: 1.5rem;
             box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: box-shadow 0.3s ease;
         }
         .timeline-item:hover .timeline-card {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3), 0 0 0 4px rgb(59 130 246 / 0.5);
+            transform: none;
         }
     </style>
 </head>
@@ -274,6 +274,11 @@
                         <h4 class="font-semibold text-lg mb-2 text-gray-200">Vite</h4>
                         <p class="text-sm text-gray-400">The modern, fast alternative. Uses native ES modules for an instant dev server start. Prioritizes convention over configuration for a simpler developer experience, using Rollup for optimized production builds.</p>
                     </div>
+                </div>
+                <h3 class="text-2xl font-bold text-center mt-16 mb-8 text-gray-100">Superset Languages: The Power of TypeScript</h3>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="font-semibold text-lg mb-2 text-gray-200">TypeScript</h4>
+                    <p class="text-sm text-gray-400">TypeScript is a superset of JavaScript that introduces static typing, which allows developers to catch type-related errors at compile-time instead of runtime. It also provides enhanced tooling support in IDEs, like intelligent autocompletion and code refactoring, making large, complex codebases easier to manage and more reliable.</p>
                 </div>
             </div>
         </section>
